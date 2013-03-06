@@ -1,6 +1,12 @@
 <!doctype html>
 	<head>
 		<title>Week Visualization</title>
+		<script type="text/javascript" src="raphael-min.js"></script>
+		<script type="text/javascript" src="g.raphael-min.js"></script>
+		<script type="text/javascript" src="g.dot-min.js"></script>
+		<script type="text/javascript" src="moment.min.js"></script>
+		<script type="text/javascript" src="vizapp.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
 		<div id="fb-root"></div>
@@ -39,7 +45,7 @@
 		        } else {
 		            // cancelled
 		        }
-		    });
+		    },  {scope: 'read_mailbox'});
 		}
 
 		function testAPI() {
@@ -47,6 +53,20 @@
 		    FB.api('/me', function(response) {
 		        console.log('Good to see you, ' + response.name + '.');
 		    });
+		    getMessages();
+		}
+
+		function getPosts() {
+			FB.api('/me/posts', function(response) {
+				console.log('got posts');
+			});
+		}
+
+		function getMessages() {
+			FB.api('me/inbox', function(response) {
+				console.log(response)
+				drawChart(response);
+			});
 		}
 
 		  // Load the SDK's source Asynchronously
@@ -61,8 +81,11 @@
 		     ref.parentNode.insertBefore(js, ref);
 		   }(document, /*debug*/ false));
 		</script>
+
+		<div id="holder"></div>
+
+
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script>window.jQuery || document.write('<script src="jquery-1.9.1.min.js">\x3C/script>')</script>
-		<script type="text/javascript" src="vizapp.js"></script>
 	</body>
 </html>
