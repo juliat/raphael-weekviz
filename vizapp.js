@@ -131,7 +131,9 @@ function drawCircles(paper, circles) {
 	for (var i = 0; i < circles.length; i++) {
 		cx = circles[i]['cx'];
 		cy = circles[i]['cy'];
-		var radius = 10;
-		paper.circle(cx, cy, radius);
+		var radius = 3;
+		var circle = paper.circle(cx, cy, radius);
+		circle.attr("fill", "#000");
+		circle.attr("opacity", 0.1);
 	}
 }
