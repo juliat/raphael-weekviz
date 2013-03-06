@@ -6,25 +6,46 @@ var xUnit = 0;
 var leftMargin = 20;
 var topMargin = 20;
 
-var fbData = $.getJSON("facebook-inbox.json", function(json) {
+var fbData;
+var emailData;
+
+$.getJSON("facebook-inbox.json", function(json) {
 	console.log('facebook');
     console.log(json);
+    fbData = json;
+    // debugger;
+   // drawChart(fbData);
 });
 
-var emailData = $.getJSON("messages.json", function(json) {
+$.getJSON("messages.json", function(json) {
 	console.log('email');
 	console.log(json);
-})
+	emailData = json;
+	// drawChart(emailData);
+});
+
+
+function init() {
+	drawChart(fbData)
+}
+
 
 
 /* more or less the main function for drawing the chart */
-function drawChart(data) {
+function drawChart(response) {
 	console.log('in drawChart');
-	console.log(data);
+	console.log(response);
 	var paper = drawCanvas();
 	drawAxis(paper);
-	var circlePoints = getPoints(data);
-	drawCircles(paper, circlePoints);
+	drawPoints(response);
+}
+
+function drawPoints(response) {
+	console.log('drawing circles');
+	var circlePoints = getPoints(response);
+	console.log('cricle points');
+	console.log(circlePoints);
+	// drawCircles(paper, circlePoints);
 }
 
 /* set up a raphael canvas and return the canvas object so we can pass it around to otehr drawing funcitons */
@@ -40,20 +61,32 @@ function drawCanvas() {
 /* get the day and time of a message object so we can use it to plot a point or points for that message.
 returns an array of days and times of messages */
 function getPoints(response) {
+	console.log('in getPoints');
+	console.log(response);
 	var circlePoints = [];
 	// for each message chain we want to know when it started and when any followup comments occured
 	// debugger;
-	console.log('in getPoints');
 	var dateCreated;
 	var coords;
-	for (var i = 0; i < response.data.length; i++) {
+	var responseLength = response.data.length;
+	console.log('response length is '+responseLength);
+	var i = 0;
+	while (i< responseLength) {
+		// console.log('response data index is ' + i);
+		// console.log(response.data[i]);
 		if (typeof response.data[i].comments != "undefined") {
+			// console.log('looping over this messages comments')
 			var messagesArray = response.data[i].comments.data;
-			for (var i = 0; i < messagesArray.length; i++) {
-				dateCreated = messagesArray[i].created_time;
+			// console.log('messages array length is ' + messagesArray.length);
+			var j = 0;
+			while (j < messagesArray.length) {
+				// console.log('messagearray index is ' + i);
+				dateCreated = messagesArray[j].created_time;
 				coords = getGraphLocation(dateCreated);
 				circlePoints.push(coords);
+				j++;
 			}
+			// console.log('finished looping over messages comments');
 		}
 		else {
 			console.log('this message had no comments field');
@@ -61,7 +94,9 @@ function getPoints(response) {
 			coords = getGraphLocation(dateCreated);
 			circlePoints.push(coords);
 		}
+		i++;
 	}
+	debugger;
 	return circlePoints;
 }
 
