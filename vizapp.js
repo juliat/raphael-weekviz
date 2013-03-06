@@ -6,6 +6,16 @@ var xUnit = 0;
 var leftMargin = 20;
 var topMargin = 20;
 
+var fbData = $.getJSON("facebook-inbox.json", function(json) {
+	console.log('facebook');
+    console.log(json);
+});
+
+var emailData = $.getJSON("messages.json", function(json) {
+	console.log('email');
+	console.log(json);
+})
+
 
 /* more or less the main function for drawing the chart */
 function drawChart(data) {
