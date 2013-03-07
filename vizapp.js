@@ -42,7 +42,8 @@ function drawFBPoints(fbData, paper) {
 
 function drawEmailPoints(emailData, paper) {
 	var emailPoints = getEmailPoints(emailData);
-	// draw squares?
+	// console.log(emailPoints);
+	drawSquares(paper, emailPoints);
 }
 
 /* set up a raphael canvas and return the canvas object so we can pass it around to otehr drawing funcitons */
@@ -54,37 +55,62 @@ function drawCanvas() {
 	return paper;
 }
 
-
 function getEmailPoints(emailData) {
 	var emailPoints = [];
-	console.log('emailData');
+	var dateCreated;
+	var coords;
+	var dataLen = emailData.length;
+	i = 0;
+	while (i < dataLen) {
+		var emailMessage = emailData[i];
+		date = emailMessage['date']+"";
+		coords = getGraphLocation(date, 'X');
+		// people = getEmailPeople(emailData[i]);
+		// coords['people'] = people;
+		emailPoints.push(coords);
+		i++;
+	}
+	return emailPoints;
+}
+
+function getEmailPeople(email) {
+	// debugger;
+	var names = [];
+	var toPeople = email.addresses.to;
+	var fromPeople = email.addresses.from;
+	if ($.isArray(toPeople)) {
+		names.push(getNamesArray(toPeople));
+	}
+	else {
+		names.push(name);
+	}
+	if ($.isArray(fromPeople)) {
+		names.push(getNamesArray(fromPeople));
+	}
+	else {
+		names.push(name);
+	}
+	return names;	
 }
 
 /* get the day and time of a message object so we can use it to plot a point or points for that message.
 returns an array of days and times of messages */
-function getFacebookPoints(response) {
-	console.log('in getPoints');
-	console.log(response);
+function getFacebookPoints(fbData) {
 	var facebookPoints = [];
 	// for each message chain we want to know when it started and when any followup comments occured
-	// debugger;
 	var dateCreated;
 	var coords;
-	var responseLength = response.data.length;
-	console.log('response length is '+responseLength);
+	var responseLength = fbData.data.length;
 	var i = 0;
 	while (i< responseLength) {
-		// console.log('response data index is ' + i);
-		// console.log(response.data[i]);
-		if (typeof response.data[i].comments != "undefined") {
-			// console.log('looping over this messages comments')
-			var messagesArray = response.data[i].comments.data;
-			// console.log('messages array length is ' + messagesArray.length);
+		// people = getFBPeople(person = fbData.data[i].to.data);
+		if (typeof fbData.data[i].comments != "undefined") {
+			var messagesArray = fbData.data[i].comments.data;
 			var j = 0;
 			while (j < messagesArray.length) {
-				// console.log('messagearray index is ' + i);
 				dateCreated = messagesArray[j].created_time;
-				coords = getGraphLocation(dateCreated);
+				coords = getGraphLocation(dateCreated, '');
+				// coords['people'] = people;
 				facebookPoints.push(coords);
 				j++;
 			}
@@ -92,8 +118,8 @@ function getFacebookPoints(response) {
 		}
 		else {
 			console.log('this message had no comments field');
-			dateCreated = response.data[i].updated_time;
-			coords = getGraphLocation(dateCreated);
+			dateCreated = fbData.data[i].updated_time;
+			coords = getGraphLocation(dateCreated, '');
 			facebookPoints.push(coords);
 		}
 		i++;
@@ -101,17 +127,41 @@ function getFacebookPoints(response) {
 	return facebookPoints;
 }
 
-function getGraphLocation(dateCreated) {
-	var day = moment(dateCreated).format('d');
-	var hour = moment(dateCreated).format('H');
-	var minutes = moment(dateCreated).format('mm');
+function getFBPeople(toListData) {
+	var names = getNamesArray(toListData);
+	return names;
+}
+
+function getNamesArray(namesObjectList) {
+	var names = [];
+	for (var i = 0; i < namesObjectList.length; i++) {
+		var name = namesObjectList[i].name;
+		if (name !== "Julia Teitelbaum") {
+			names.push(name);
+		}
+	}	
+	return names;
+}
+
+function getGraphLocation(dateCreated, format) {
+	if (format != '') {
+		// debugger;
+		var day = moment(dateCreated, format).format('d');
+		var hour = moment(dateCreated, format).format('H');
+		var minutes = moment(dateCreated, format).format('mm');
+	}
+	else {
+		var day = moment(dateCreated).format('d');
+		var hour = moment(dateCreated).format('H');
+		var minutes = moment(dateCreated).format('mm');
+	}
 	// x position is based on time
 	var x = timeToXCoord(hour, minutes);
 	// y position is based on day
 	var y = dayToYCoord(day);
 	var coords = {
-		'cx' : x,
-		'cy' : y
+		'x' : x,
+		'y' : y
 	}
 	return coords;
 }
@@ -163,11 +213,36 @@ function drawCircles(paper, circles) {
 	var cx;
 	var cy;
 	for (var i = 0; i < circles.length; i++) {
-		cx = circles[i]['cx'];
-		cy = circles[i]['cy'];
+		cx = circles[i]['x'] + (leftMargin);
+		cy = circles[i]['y'];
 		var radius = 2;
 		var circle = paper.circle(cx, cy, radius);
-		circle.attr("fill", "#000");
+		circle.attr("fill", "#00ff00");
 		circle.attr("opacity", 0.2);
 	}
+}
+
+function drawSquares(paper, squares) {
+	// debugger;
+	var x;
+	var y;
+	var paperSquares = [];
+	for (var i = 0; i < squares.length; i++) {
+		sx = squares[i]['x'] + (leftMargin);
+		sy = squares[i]['y'] + 10;
+		var swidth = 4;
+		var sheight = 4;
+		paperSquares.push({
+			type: 'rect',
+			x: sx,
+			y: sy,
+			width: swidth,
+			height: sheight,
+			fill: '#ff0000',
+			opacity: 0.2
+		});
+	}
+	console.log('paperSquares');
+	console.log(paperSquares);
+	paper.add(paperSquares);
 }
