@@ -25,27 +25,24 @@ $.getJSON("messages.json", function(json) {
 });
 
 
-function init() {
-	drawChart(fbData)
-}
-
-
-
 /* more or less the main function for drawing the chart */
-function drawChart(response) {
+function drawChart(fbData, emailData) {
 	console.log('in drawChart');
-	console.log(response);
+	console.log(fbData);
 	var paper = drawCanvas();
 	drawAxis(paper);
-	drawPoints(response, paper);
+	drawFBPoints(fbData, paper);
+	drawEmailPoints(emailData, paper);
 }
 
-function drawPoints(response, paper) {
-	console.log('drawing circles');
-	var circlePoints = getPoints(response);
-	console.log('circle points');
-	console.log(circlePoints);
-	drawCircles(paper, circlePoints);
+function drawFBPoints(fbData, paper) {
+	var fbPoints = getFacebookPoints(fbData);
+	drawCircles(paper, fbPoints);
+}
+
+function drawEmailPoints(emailData, paper) {
+	var emailPoints = getEmailPoints(emailData);
+	// draw squares?
 }
 
 /* set up a raphael canvas and return the canvas object so we can pass it around to otehr drawing funcitons */
@@ -58,12 +55,17 @@ function drawCanvas() {
 }
 
 
+function getEmailPoints(emailData) {
+	var emailPoints = [];
+	console.log('emailData');
+}
+
 /* get the day and time of a message object so we can use it to plot a point or points for that message.
 returns an array of days and times of messages */
-function getPoints(response) {
+function getFacebookPoints(response) {
 	console.log('in getPoints');
 	console.log(response);
-	var circlePoints = [];
+	var facebookPoints = [];
 	// for each message chain we want to know when it started and when any followup comments occured
 	// debugger;
 	var dateCreated;
@@ -83,7 +85,7 @@ function getPoints(response) {
 				// console.log('messagearray index is ' + i);
 				dateCreated = messagesArray[j].created_time;
 				coords = getGraphLocation(dateCreated);
-				circlePoints.push(coords);
+				facebookPoints.push(coords);
 				j++;
 			}
 			// console.log('finished looping over messages comments');
@@ -92,11 +94,11 @@ function getPoints(response) {
 			console.log('this message had no comments field');
 			dateCreated = response.data[i].updated_time;
 			coords = getGraphLocation(dateCreated);
-			circlePoints.push(coords);
+			facebookPoints.push(coords);
 		}
 		i++;
 	}
-	return circlePoints;
+	return facebookPoints;
 }
 
 function getGraphLocation(dateCreated) {
@@ -166,6 +168,6 @@ function drawCircles(paper, circles) {
 		var radius = 2;
 		var circle = paper.circle(cx, cy, radius);
 		circle.attr("fill", "#000");
-		circle.attr("opacity", 0.25);
+		circle.attr("opacity", 0.2);
 	}
 }
