@@ -37,15 +37,15 @@ function drawChart(response) {
 	console.log(response);
 	var paper = drawCanvas();
 	drawAxis(paper);
-	drawPoints(response);
+	drawPoints(response, paper);
 }
 
-function drawPoints(response) {
+function drawPoints(response, paper) {
 	console.log('drawing circles');
 	var circlePoints = getPoints(response);
-	console.log('cricle points');
+	console.log('circle points');
 	console.log(circlePoints);
-	// drawCircles(paper, circlePoints);
+	drawCircles(paper, circlePoints);
 }
 
 /* set up a raphael canvas and return the canvas object so we can pass it around to otehr drawing funcitons */
@@ -96,21 +96,8 @@ function getPoints(response) {
 		}
 		i++;
 	}
-	debugger;
 	return circlePoints;
 }
-
-/*
-function dateToDayTime(UTCdate) {
-	var dayStr = moment(UTCdate).format('dddd');
-	var timeStr = moment(UTCdate).format('h:mm a');
-	var date = {
-		'day': dayStr,
-		'time':timeStr
-	};
-	return date;
-}
-*/
 
 function getGraphLocation(dateCreated) {
 	var day = moment(dateCreated).format('d');
@@ -176,9 +163,9 @@ function drawCircles(paper, circles) {
 	for (var i = 0; i < circles.length; i++) {
 		cx = circles[i]['cx'];
 		cy = circles[i]['cy'];
-		var radius = 3;
+		var radius = 2;
 		var circle = paper.circle(cx, cy, radius);
 		circle.attr("fill", "#000");
-		circle.attr("opacity", 0.1);
+		circle.attr("opacity", 0.25);
 	}
 }
