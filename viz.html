@@ -12,5 +12,18 @@
 	</head>
 	<body>
 		<div id="holder"></div>
+		<script>
+			function drawData() {
+				// debugger;
+				if ((typeof fbData === "object") && (typeof emailData === "object")) {
+					drawChart(fbData, emailData);
+				} 
+				else {
+					console.log('no data; will try again in 1s');
+					setTimeout(drawData, 1000);
+				}
+			}
+			drawData();
+		</script>
 	</body>
 </html>
